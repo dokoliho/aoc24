@@ -1,4 +1,5 @@
 from solution import Solution
+from collections import Counter
 
 
 class Day01Solution(Solution):
@@ -24,9 +25,8 @@ class Day01Solution(Solution):
     def calculate_similarity_scores(self):
         left, right = self.split_puzzle()
         left = map(int, left)
-        right = list(map(int, right))
-        right_counts = {num: right.count(num) for num in set(right)}
-        return [right_counts.get(num, 0) * num for num in left]
+        right = Counter(map(int, right))
+        return [num * right[num] for num in left]
 
     def split_puzzle(self):
         return zip(*[line.split() for line in self.puzzle])
