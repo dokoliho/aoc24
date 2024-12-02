@@ -65,8 +65,10 @@ def calculate_similarity_scores(puzzle):
     # Calculate scores for the left list using the counts from the right
     scores = []
     for num in left:
-        count = right_counts.get(num, 0)  # Default to 0 if the number is not in right
-        scores.append(count * num)
+        if num not in right_counts:
+            scores.append(0)
+        else:
+            scores.append(right_counts[num] * num)
 
     return scores
 
