@@ -57,7 +57,7 @@ with open(day_desc_path, "w", encoding='utf-8') as md_file:
     md_file.close()
 
 ########### COLLECT TEST INPUT ###########
-test_input_path = os.path.join(dest, 'day02_test_input.txt')
+test_input_path = os.path.join(dest, f'day{int(args.d):02}_test_input.txt')
 for i, section in enumerate(instructions):
     if section.name == 'p' and 'example' in section.text.lower():
         next_section = section.find_next_sibling()
@@ -69,7 +69,7 @@ for i, section in enumerate(instructions):
             break
 
 ########### COLLECT REAL INPUT ###########
-real_input_path = os.path.join(dest, 'day02_input.txt')
+real_input_path = os.path.join(dest, f'day{int(args.d):02}_input.txt')
 with open(real_input_path,"w") as file:
     output = subprocess.check_output(f'curl {day_url}/input --cookie "session={session}"', shell=True)
     output = output.decode('utf-8')
