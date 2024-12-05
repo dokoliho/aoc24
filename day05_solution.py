@@ -13,12 +13,11 @@ class Day03Solution(Solution):
 
     def solve_part_1(self):
         self.init_data()
-        sum = 0
-        for sequence in self.sequences:
-            sorted_sequence = self.sorted_sequence(sequence)
-            if sequence == sorted_sequence:
-                sum += sequence[len(sequence) // 2]
-        return sum
+        return sum(
+            sequence[len(sequence) // 2]
+            for sequence in self.sequences
+            if sequence == self.sorted_sequence(sequence)
+        )
 
     def init_data(self):
         is_order_line = True
@@ -38,12 +37,11 @@ class Day03Solution(Solution):
 
     def solve_part_2(self):
         self.init_data()
-        sum = 0
-        for sequence in self.sequences:
-            sorted_sequence = self.sorted_sequence(sequence)
-            if sequence != sorted_sequence:
-                sum += sorted_sequence[len(sorted_sequence) // 2]
-        return sum
+        return sum(
+            sorted_sequence[len(sorted_sequence) // 2]
+            for sequence in self.sequences
+            if sequence != (sorted_sequence := self.sorted_sequence(sequence))
+        )
 
     def sorted_sequence(self, sequence):
         def compare(a, b):
