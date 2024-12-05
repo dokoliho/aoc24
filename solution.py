@@ -35,8 +35,10 @@ class Solution:
         start = pfc()
         result1 = self.solve_part_1()
         print(f"Test Teil 1: {result1} ({pfc() - start:.4f}s)")
-        assert result1 == self.expected_test_result_part_1
+        assert result1 == self.expected_test_result_part_1, \
+            f"Expected {self.expected_test_result_part_1} but got {result1}"
         start = pfc()
         result2 = self.solve_part_2()
-        assert result2 == self.expected_test_result_part_2
+        assert result2 == self.expected_test_result_part_2, \
+            f"Expected {self.expected_test_result_part_2} but got {result2}"
         print(f"Test Teil 2: {result2} ({pfc() - start:.4f}s)")
