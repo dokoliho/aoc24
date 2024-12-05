@@ -53,7 +53,6 @@ class Day03Solution(Solution):
         return sorted(sequence, key=cmp_to_key(compare))
 
 
-
 if __name__ == "__main__":
     Day03Solution().test()
     Day03Solution().solve()
