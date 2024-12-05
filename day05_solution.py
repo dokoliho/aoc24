@@ -15,8 +15,8 @@ class Day03Solution(Solution):
         self.init_data()
         sum = 0
         for sequence in self.sequences:
-            sorted = self.sorted_sequence(sequence)
-            if sequence == sorted:
+            sorted_sequence = self.sorted_sequence(sequence)
+            if sequence == sorted_sequence:
                 sum += sequence[len(sequence) // 2]
         return sum
 
@@ -40,9 +40,9 @@ class Day03Solution(Solution):
         self.init_data()
         sum = 0
         for sequence in self.sequences:
-            sorted = self.sorted_sequence(sequence)
-            if sequence != sorted:
-                sum += sorted[len(sorted) // 2]
+            sorted_sequence = self.sorted_sequence(sequence)
+            if sequence != sorted_sequence:
+                sum += sorted_sequence[len(sorted_sequence) // 2]
         return sum
 
     def sorted_sequence(self, sequence):
