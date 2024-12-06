@@ -43,11 +43,11 @@ class Day06Solution(Solution):
 
 
     def move_guard(self, guard, puzzle, blocks):
-        visited = []
+        visited = set()
         while True:
             if guard in visited:
                 return visited, True
-            visited.append(guard)
+            visited.add(guard)
             row, col, direction = guard
             new_row = row + self.directions[direction][0]
             new_col = col + self.directions[direction][1]
@@ -66,28 +66,20 @@ class Day06Solution(Solution):
         guard = self.find_guard(puzzle)
         blocks = set(self.find_blocks(puzzle))
         visited, _ = self.move_guard(guard, puzzle, blocks)
-        path = self.extract_path(visited)
+        locations = self.extract_locations(visited)
         cycles_blocks = set()
-        total = len(path)
-        for block in path:
+        for block in locations:
+            if block == guard[:2]:
+                continue
             blocks.add(block)
-            total -= 1
-            print(total)
             _, cycle = self.move_guard(guard, puzzle, blocks)
             if cycle:
                 cycles_blocks.add(block)
             blocks.remove(block)
         return len(cycles_blocks)
 
-    def extract_path(self, visited):
-        path = []
-        for g1, g2 in pairwise(visited):
-            pos1 = (g1[0], g1[1])
-            pos2 = (g2[0], g2[1])
-            if pos1 == pos2:
-                continue
-            path.append(pos2)
-        return path
+    def extract_locations(self, visited):
+        return {(row, col) for row, col, _ in visited}
 
 
 if __name__ == "__main__":
