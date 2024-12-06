@@ -1,3 +1,4 @@
+from itertools import pairwise
 from mimetypes import guess_type
 
 from solution import Solution
@@ -16,15 +17,13 @@ class Day06Solution(Solution):
         self.expected_test_result_part_2 = 6
 
     def solve_part_1(self):
-        puzzle = copy.deepcopy(self.puzzle)
+        puzzle = self.puzzle
         guard = self.find_guard(puzzle)
-        count = 0
-        continue_loop, guard, count = self.move_guard(guard, puzzle, count)
-        while continue_loop:
-            continue_loop, guard, count = self.move_guard(guard, puzzle, count)
-        for line in puzzle:
-            print(line)
-        return count
+        blocks = self.find_blocks(puzzle)
+        visited, _ = self.move_guard(guard, puzzle, blocks)
+        positions = set([(row, col) for row, col, _ in visited])
+        return len(positions)
+
 
     def find_guard(self, puzzle):
         for row in range(len(puzzle)):
@@ -33,59 +32,62 @@ class Day06Solution(Solution):
                     return row, col, puzzle[row][col]
         return None
 
-    def move_guard(self, guard, puzzle, count=0, visited=None):
-        row, col, direction = guard
-        destination = (row + self.directions[direction][0], col + self.directions[direction][1])
-        if destination[0] < 0 or destination[0] >= len(puzzle) or destination[1] < 0 or destination[1] >= len(puzzle[row]):
-            count = self.mark_position(count, puzzle, row, col)
-            if visited is not None:
-                visited[(row, col)].add(direction)
-            return False, guard, count
-        if puzzle[destination[0]][destination[1]] == '#':
-            new_direction = self.turn_sequence[(self.turn_sequence.index(direction) + 1) % 4]
-            if visited is not None:
-                visited[(row, col)].add(direction)
-            return True, (row, col, new_direction), count
-        count = self.mark_position(count, puzzle, row, col)
-        if visited is not None:
-            visited[(row, col)].add(direction)
-            if direction in visited[(destination[0], destination[1])]:
-                return False, (destination[0], destination[1], direction), -1
-        return True, (destination[0], destination[1], direction), count
 
-    def mark_position(self, count, puzzle, row, col):
-        if puzzle[row][col] != 'X':
-            count += 1
-            chars = list(puzzle[row])
-            chars[col] = 'X'
-            puzzle[row] = ''.join(chars)
-        return count
-
-    def solve_part_2(self):
-        puzzle = copy.deepcopy(self.puzzle)
-        guard = self.find_guard(puzzle)
-        initial_guard_pos = (guard[0], guard[1])
-        continue_loop, guard, _ = self.move_guard(guard, puzzle)
-        blocks = 0
-        while continue_loop:
-            continue_loop, new_guard, count = self.move_guard(guard, puzzle)
-            row, col, direction = new_guard
-            if (row, col) != (guard[0], guard[1]) and (row, col) != initial_guard_pos:
-#            if (row, col) != initial_guard_pos:
-                visited = defaultdict(set)
-                if self.check_block_position(row, col, guard, copy.deepcopy(puzzle), visited):
-                    blocks += 1
-            guard = new_guard
+    def find_blocks(self, puzzle):
+        blocks = []
+        for row in range(len(puzzle)):
+            for col in range(len(puzzle[row])):
+                if puzzle[row][col] in ['#', 'O']:
+                    blocks.append((row, col))
         return blocks
 
-    def check_block_position(self, row, col, guard, puzzle, visited):
-        chars = list(puzzle[row])
-        chars[col] = '#'
-        puzzle[row] = ''.join(chars)
-        continue_loop, guard, count = self.move_guard(guard, puzzle, 0, visited)
-        while continue_loop and count != -1:
-            continue_loop, guard, count = self.move_guard(guard, puzzle, 0, visited)
-        return count == -1
+
+    def move_guard(self, guard, puzzle, blocks):
+        visited = []
+        while True:
+            if guard in visited:
+                return visited, True
+            visited.append(guard)
+            row, col, direction = guard
+            new_row = row + self.directions[direction][0]
+            new_col = col + self.directions[direction][1]
+            if new_row < 0 or new_row >= len(puzzle) or new_col < 0 or new_col >= len(puzzle[new_row]):
+                break
+            if (new_row, new_col) in blocks:
+                new_direction = self.turn_sequence[(self.turn_sequence.index(direction) + 1) % 4]
+                guard = (row, col, new_direction)
+                continue
+            guard = (new_row, new_col, direction)
+        return visited, False
+
+
+    def solve_part_2(self):
+        puzzle = self.puzzle
+        guard = self.find_guard(puzzle)
+        blocks = set(self.find_blocks(puzzle))
+        visited, _ = self.move_guard(guard, puzzle, blocks)
+        path = self.extract_path(visited)
+        cycles_blocks = set()
+        total = len(path)
+        for block in path:
+            blocks.add(block)
+            total -= 1
+            print(total)
+            _, cycle = self.move_guard(guard, puzzle, blocks)
+            if cycle:
+                cycles_blocks.add(block)
+            blocks.remove(block)
+        return len(cycles_blocks)
+
+    def extract_path(self, visited):
+        path = []
+        for g1, g2 in pairwise(visited):
+            pos1 = (g1[0], g1[1])
+            pos2 = (g2[0], g2[1])
+            if pos1 == pos2:
+                continue
+            path.append(pos2)
+        return path
 
 
 if __name__ == "__main__":
