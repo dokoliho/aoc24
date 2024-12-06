@@ -1,7 +1,7 @@
 from solution import Solution
 from functools import cmp_to_key
 
-class Day03Solution(Solution):
+class Day05Solution(Solution):
 
     def __init__(self):
         super().__init__()
@@ -54,5 +54,5 @@ class Day03Solution(Solution):
 
 
 if __name__ == "__main__":
-    Day03Solution().test()
-    Day03Solution().solve()
+    Day05Solution().test()
+    Day05Solution().solve()

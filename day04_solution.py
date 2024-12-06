@@ -1,7 +1,7 @@
 from solution import Solution
 import re
 
-class Day03Solution(Solution):
+class Day04Solution(Solution):
 
     def __init__(self):
         super().__init__()
@@ -88,5 +88,5 @@ class Day03Solution(Solution):
 
 
 if __name__ == "__main__":
-    Day03Solution().test()
-    Day03Solution().solve()
+    Day04Solution().test()
+    Day04Solution().solve()
