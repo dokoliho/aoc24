@@ -71,6 +71,7 @@ class Day06Solution(Solution):
             continue_loop, new_guard, count = self.move_guard(guard, puzzle)
             row, col, direction = new_guard
             if (row, col) != (guard[0], guard[1]) and (row, col) != initial_guard_pos:
+#            if (row, col) != initial_guard_pos:
                 visited = defaultdict(set)
                 if self.check_block_position(row, col, guard, copy.deepcopy(puzzle), visited):
                     blocks += 1
