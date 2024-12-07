@@ -1,5 +1,4 @@
 from solution import Solution
-from itertools import product
 import math
 
 
@@ -20,7 +19,6 @@ OPERATIONS2 = [add, mul, concat]
 
 class Day07Solution(Solution):
 
-
     def __init__(self):
         super().__init__()
         self.day = 7
@@ -30,7 +28,7 @@ class Day07Solution(Solution):
 
     def solve_part_1(self):
         self.get_equations()
-        return sum([e[0] for e in self.equations if self.is_valid(e, OPERATIONS)])
+        return sum([e[0] for e in self.equations if self.is_valid_recursive(e, OPERATIONS)])
 
     def get_equations(self):
         results, operands = zip(*[line.split(":") for line in self.puzzle])
@@ -38,28 +36,22 @@ class Day07Solution(Solution):
         results = list(map(int, results))
         self.equations = list(zip(results, operands))
 
-    def is_valid(self, equation, possible_operations):
-        count = len(equation[1]) - 1
-        for operations in product(possible_operations, repeat=count):
-            if self.is_valid_with_operations(equation, operations):
+    def is_valid_recursive(self, equation, possible_operations):
+        expected_result, operands = equation
+        if len(operands) == 1:
+            return expected_result == operands[0]
+        for op in possible_operations:
+            result = op(operands[0], operands[1])
+            if result > expected_result:
+                continue
+            new_operands = (result,) + operands[2:]
+            if self.is_valid_recursive((expected_result, new_operands), possible_operations):
                 return True
         return False
 
-    def is_valid_with_operations(self, equation, operations):
-        result, operands = equation
-        return result == self.calculate_result(operands, operations, result)
-
-    def calculate_result(self, operands, operations, limit=None):
-        result = operands[0]
-        for i, op in enumerate(operations):
-            result = op(result, operands[i + 1])
-            if limit and result > limit:
-                return -1
-        return result
-
     def solve_part_2(self):
         self.get_equations()
-        return sum([e[0] for e in self.equations if self.is_valid(e, OPERATIONS2)])
+        return sum([e[0] for e in self.equations if self.is_valid_recursive(e, OPERATIONS2)])
 
 
 
