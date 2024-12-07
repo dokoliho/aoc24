@@ -1,14 +1,10 @@
-from itertools import pairwise
-from mimetypes import guess_type
-
 from solution import Solution
-from collections import defaultdict
-import copy
+
 
 class Day06Solution(Solution):
 
-    directions = {'^': (-1, 0), 'v': (1, 0), '>': (0, 1), '<': (0, -1)}
-    turn_sequence = ['^', '>', 'v', '<']
+    DIRECTIONS = {'^': (-1, 0), 'v': (1, 0), '>': (0, 1), '<': (0, -1)}
+    TURN_SEQUENCE = ['^', '>', 'v', '<']
 
     def __init__(self):
         super().__init__()
@@ -24,23 +20,20 @@ class Day06Solution(Solution):
         positions = set([(row, col) for row, col, _ in visited])
         return len(positions)
 
-
     def find_guard(self, puzzle):
         for row in range(len(puzzle)):
             for col in range(len(puzzle[row])):
-                if puzzle[row][col] in self.turn_sequence:
+                if puzzle[row][col] in self.TURN_SEQUENCE:
                     return row, col, puzzle[row][col]
         return None
-
 
     def find_blocks(self, puzzle):
         blocks = []
         for row in range(len(puzzle)):
             for col in range(len(puzzle[row])):
-                if puzzle[row][col] in ['#', 'O']:
+                if puzzle[row][col] == '#':
                     blocks.append((row, col))
         return blocks
-
 
     def move_guard(self, guard, puzzle, blocks):
         visited = set()
@@ -49,12 +42,12 @@ class Day06Solution(Solution):
                 return visited, True
             visited.add(guard)
             row, col, direction = guard
-            new_row = row + self.directions[direction][0]
-            new_col = col + self.directions[direction][1]
+            new_row = row + self.DIRECTIONS[direction][0]
+            new_col = col + self.DIRECTIONS[direction][1]
             if new_row < 0 or new_row >= len(puzzle) or new_col < 0 or new_col >= len(puzzle[new_row]):
                 break
             if (new_row, new_col) in blocks:
-                new_direction = self.turn_sequence[(self.turn_sequence.index(direction) + 1) % 4]
+                new_direction = self.TURN_SEQUENCE[(self.TURN_SEQUENCE.index(direction) + 1) % 4]
                 guard = (row, col, new_direction)
                 continue
             guard = (new_row, new_col, direction)
@@ -78,7 +71,8 @@ class Day06Solution(Solution):
             blocks.remove(block)
         return len(cycles_blocks)
 
-    def extract_locations(self, visited):
+    @staticmethod
+    def extract_locations(visited):
         return {(row, col) for row, col, _ in visited}
 
 
