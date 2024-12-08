@@ -10,7 +10,7 @@ def mul(a, b):
 
 def concat(a, b):
     if b == 0:
-        return a * 10 + b  # Special case for single-digit 0
+        return a * 10 + b
     b_length = int(math.log10(b)) + 1
     return a * (10 ** b_length) + b
 
