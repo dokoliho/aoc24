@@ -1,18 +1,8 @@
 from solution import Solution
-import math
-
-
-def add(a, b):
-    return a + b
-
-def mul(a, b):
-    return a * b
+from operator import add, mul
 
 def concat(a, b):
-    if b == 0:
-        return a * 10 + b
-    b_length = int(math.log10(b)) + 1
-    return a * (10 ** b_length) + b
+    return int(str(a)+str(b))
 
 OPERATIONS = [add, mul]
 OPERATIONS2 = [add, mul, concat]
