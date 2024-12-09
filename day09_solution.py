@@ -1,7 +1,4 @@
 from solution import Solution
-from collections import defaultdict
-from itertools import combinations
-import math
 
 class Day09Solution(Solution):
 
@@ -24,11 +21,19 @@ class Day09Solution(Solution):
 
 
     def split_input(self):
-        file_sizes = [int(x) for x in list(self.puzzle[0][0::2])]
-        free_blocks = [int(x) for x in list(self.puzzle[0][1::2])]
-        return file_sizes, free_blocks
+        pos = 0
+        blocks = []
+        for c in list(self.puzzle[0]):
+            l = int(c)
+            blocks.append((pos, l))
+            pos += l
+        files = [block for block in blocks[0::2]]
+        gaps = [block for block in blocks[1::2]]
+        return files, gaps
 
-    def generate_block_sequence(self, file_sizes, free_blocks):
+    def generate_block_sequence(self, files, gaps):
+        file_sizes = [file[1] for file in files]
+        free_blocks = [gap[1] for gap in gaps]
         current_file = 0
         moving_file = len(file_sizes) - 1
         gap = 0
@@ -49,45 +54,45 @@ class Day09Solution(Solution):
                 gap += 1
 
 
-    def file_sequence(self, file_sizes, free_blocks):
+    def file_sequence(self, files, gaps):
 
-        file_pos = []
-        gap_pos = []
+        def file_size(index):
+            return files[index][1]
 
-        pos = 0
-        free_blocks.append(0)
-        for x in range(len(file_sizes)):
-            file_pos.append(pos)
-            pos += file_sizes[x] + free_blocks[x]
-        free_blocks.pop()
+        def file_pos(index):
+            return files[index][0]
 
-        pos = file_sizes[0]
-        for x in range(len(free_blocks)):
-            gap_pos.append(pos)
-            pos += free_blocks[x] + file_sizes[x+1]
+        def free_blocks(index):
+            return gaps[index][1]
 
-        for moving_file in range(len(file_sizes)-1, -1, -1):
-            for gap in range(len(free_blocks)):
+        def gap_pos(index):
+            return gaps[index][0]
+
+
+        for moving_file in range(len(files)-1, -1, -1):
+            for gap in range(len(gaps)):
                 if gap >= moving_file: break
-                if file_sizes[moving_file] <= free_blocks[gap]:
-                    file_pos[moving_file] = gap_pos[gap]
-                    gap_pos[gap] += file_sizes[moving_file]
-                    if moving_file < len(free_blocks):
-                        free_blocks[moving_file] += file_sizes[moving_file]
-                    free_blocks[gap] -= file_sizes[moving_file]
+                if file_size(moving_file) <= free_blocks(gap):
+                    files[moving_file] = (gap_pos(gap), file_size(moving_file))
+                    gaps[gap] = ( gap_pos(gap) + file_size(moving_file) ,
+                                  free_blocks(gap) - file_size(moving_file))
+                    if moving_file < len(gaps):
+                        gaps[moving_file] = (gap_pos(moving_file),
+                                     free_blocks(moving_file) + file_size(moving_file))
                     break
 
+        file_pos = [file[0] for file in files]
         return sorted(enumerate(file_pos), key=lambda x: x[1])
 
 
-    def generate_block_sequence2(self, file_sizes, free_blocks):
-        file_sequence = self.file_sequence(file_sizes, free_blocks)
+    def generate_block_sequence2(self, files, gaps):
+        file_sequence = self.file_sequence(files, gaps)
         curr_pos = 0
         for file, pos in file_sequence:
             while curr_pos < pos:
                 yield 0
                 curr_pos += 1
-            for i in range(file_sizes[file]):
+            for i in range(files[file][1]):
                 yield file
                 curr_pos += 1
 
