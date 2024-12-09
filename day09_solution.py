@@ -2,6 +2,19 @@ from solution import Solution
 
 class Day09Solution(Solution):
 
+    class Segment:
+        def __init__(self, start, length):
+            self._start = start
+            self._length = length
+
+        @property
+        def start(self):
+            return self._start
+
+        @property
+        def length(self):
+            return self._length
+
     def __init__(self):
         super().__init__()
         self.day = 9
@@ -22,20 +35,20 @@ class Day09Solution(Solution):
 
     def split_input(self):
         pos = 0
-        blocks = []
+        segments = []
         for c in list(self.puzzle[0]):
             l = int(c)
-            blocks.append((pos, l))
+            segments.append(Day09Solution.Segment(pos, l))
             pos += l
-        files = [block for block in blocks[0::2]]
-        gaps = [block for block in blocks[1::2]]
+        files = [segment for segment in segments[0::2]]
+        gaps = [segment for segment in segments[1::2]]
         return files, gaps
 
     def generate_block_sequence(self, files, gaps):
-        file_sizes = [file[1] for file in files]
-        free_blocks = [gap[1] for gap in gaps]
+        file_sizes = [file.length for file in files]
+        free_blocks = [gap.length for gap in gaps]
         current_file = 0
-        moving_file = len(file_sizes) - 1
+        moving_file = len(files) - 1
         gap = 0
         while True:
             if file_sizes[current_file] > 0:
@@ -53,35 +66,25 @@ class Day09Solution(Solution):
                 if current_file >= len(file_sizes): return
                 gap += 1
 
-
     def file_sequence(self, files, gaps):
-
-        def file_size(index):
-            return files[index][1]
-
-        def file_pos(index):
-            return files[index][0]
-
-        def free_blocks(index):
-            return gaps[index][1]
-
-        def gap_pos(index):
-            return gaps[index][0]
-
-
         for moving_file in range(len(files)-1, -1, -1):
             for gap in range(len(gaps)):
                 if gap >= moving_file: break
-                if file_size(moving_file) <= free_blocks(gap):
-                    files[moving_file] = (gap_pos(gap), file_size(moving_file))
-                    gaps[gap] = ( gap_pos(gap) + file_size(moving_file) ,
-                                  free_blocks(gap) - file_size(moving_file))
+                length = files[moving_file].length
+                if length <= gaps[gap].length:
+                    files[moving_file] = Day09Solution.Segment(
+                            gaps[gap].start,
+                            length)
+                    gaps[gap] = Day09Solution.Segment(
+                            gaps[gap].start + length,
+                            gaps[gap].length - length)
                     if moving_file < len(gaps):
-                        gaps[moving_file] = (gap_pos(moving_file),
-                                     free_blocks(moving_file) + file_size(moving_file))
+                        gaps[moving_file] = Day09Solution.Segment(
+                            gaps[moving_file].start,
+                            gaps[moving_file].length + length)
                     break
 
-        file_pos = [file[0] for file in files]
+        file_pos = [file.start for file in files]
         return sorted(enumerate(file_pos), key=lambda x: x[1])
 
 
@@ -92,7 +95,7 @@ class Day09Solution(Solution):
             while curr_pos < pos:
                 yield 0
                 curr_pos += 1
-            for i in range(files[file][1]):
+            for i in range(files[file].length):
                 yield file
                 curr_pos += 1
 
