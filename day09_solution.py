@@ -15,6 +15,10 @@ class Day09Solution(Solution):
         def length(self):
             return self._length
 
+        @length.setter
+        def length(self, value):
+            self._length = value
+
     def __init__(self):
         super().__init__()
         self.day = 9
@@ -33,16 +37,21 @@ class Day09Solution(Solution):
         return sum([index * id for index, id in enumerate(generator(files, gaps))])
 
 
-    def split_input(self):
+    def get_segments(self):
         pos = 0
         segments = []
         for c in list(self.puzzle[0]):
             l = int(c)
             segments.append(Day09Solution.Segment(pos, l))
             pos += l
+        return segments
+
+    def split_input(self):
+        segments = self.get_segments()
         files = [segment for segment in segments[0::2]]
         gaps = [segment for segment in segments[1::2]]
         return files, gaps
+
 
     def generate_block_sequence(self, files, gaps):
         file_sizes = [file.length for file in files]
