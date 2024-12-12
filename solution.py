@@ -20,8 +20,7 @@ class Solution:
         return 2
 
     def solve(self):
-        filename = f"day{self.day:02d}_input.txt"
-        self.read_puzzle(filename)
+        self.read_real_input()
         start = pfc()
         result1 = self.solve_part_1()
         print(f"Teil 1: {result1} ({pfc() - start:.4f}s)")
@@ -29,9 +28,12 @@ class Solution:
         result2 = self.solve_part_2()
         print(f"Teil 2: {result2} ({pfc() - start:.4f}s)")
 
-    def test(self):
-        filename = f"day{self.day:02d}_test_input.txt"
+    def read_real_input(self):
+        filename = f"day{self.day:02d}_input.txt"
         self.read_puzzle(filename)
+
+    def test(self):
+        self.read_test_input()
         start = pfc()
         result1 = self.solve_part_1()
         print(f"Test Teil 1: {result1} ({pfc() - start:.4f}s)")
@@ -42,3 +44,7 @@ class Solution:
         assert result2 == self.expected_test_result_part_2, \
             f"Expected {self.expected_test_result_part_2} but got {result2}"
         print(f"Test Teil 2: {result2} ({pfc() - start:.4f}s)")
+
+    def read_test_input(self):
+        filename = f"day{self.day:02d}_test_input.txt"
+        self.read_puzzle(filename)
