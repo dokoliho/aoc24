@@ -1,11 +1,7 @@
 from collections import defaultdict
 from solution import Solution
 
-
 DIRECTIONS = { "UP": (0, -1), "DOWN": (0, 1), "LEFT": (-1, 0), "RIGHT": (1, 0) }
-
-
-
 
 class D12S(Solution):
 
@@ -61,6 +57,7 @@ class D12S(Solution):
             root1 = self.find_set()
             root2 = other.find_set()
             root1.link(root2)
+            return root1 != root2 # Return True if a union was made
 
 
     def __init__(self):
@@ -89,12 +86,15 @@ class D12S(Solution):
                 garden_map[(x, y)] = D12S.Plant(self.puzzle[y][x])
         for x in range(len(self.puzzle[0])):
             for y in range(len(self.puzzle)):
-                for dir, (dx, dy) in DIRECTIONS.items():
-                    nx, ny = x + dx, y + dy
-                    if (nx, ny) in garden_map and garden_map[(x, y)].species == garden_map[(nx, ny)].species:
-                        garden_map[(x, y)].union(garden_map[(x + dx, y + dy)])
-                        garden_map[(x, y)].fences -= 1
+                self.merge_with_neighbours(garden_map, x, y)
         return garden_map
+
+    def merge_with_neighbours(self, garden_map, x, y):
+        for dir, (dx, dy) in DIRECTIONS.items():
+            nx, ny = x + dx, y + dy
+            if (nx, ny) in garden_map and garden_map[(x, y)].species == garden_map[(nx, ny)].species:
+                garden_map[(x, y)].union(garden_map[(x + dx, y + dy)])
+                garden_map[(x, y)].fences -= 1
 
     def find_sides(self, garden_map):
         for x in range(len(self.puzzle[0])):
