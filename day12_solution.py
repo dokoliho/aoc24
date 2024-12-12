@@ -82,7 +82,6 @@ class D12S(Solution):
         result = sum([size*sides for size, _, sides in regions.values()])
         return result
 
-
     def read_input(self):
         garden_map = {}
         for x in range(len(self.puzzle[0])):
@@ -106,8 +105,7 @@ class D12S(Solution):
                               for dx in [-1, 0, 1] for dy in [-1, 0, 1]}
                 # Remove sides that are connected to the same species
                 for dir, (dx, dy) in DIRECTIONS.items():
-                    nx, ny = x + dx, y + dy
-                    if (nx, ny) in garden_map and garden_map[(x, y)].species == garden_map[(nx, ny)].species:
+                    if neighbours[(dx, dy)] == species:
                         sides.remove(dir)
                 # Remove sides that are assigned to other spots in the same region
                 if "UP" in sides:
