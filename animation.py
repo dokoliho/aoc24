@@ -36,6 +36,8 @@ class Animation:
 
     def init_colors(self):
         curses.start_color()
+        curses.use_default_colors()
+
         for color in self.colors[1:]:
             self.color_count += 1
             curses.init_pair(self.color_count, color, curses.COLOR_BLACK)
@@ -51,6 +53,10 @@ class Animation:
 
     def create_window(self, width, height):
         start_y, start_x = (self._rows - height - 2) // 2, (self._cols - width - 2) // 2
+        if start_y < 0:
+            raise ValueError("Window height too large. Resize terminal.")
+        if start_x < 0:
+            raise ValueError("Window width too large. Resize terminal.")
         self._win = curses.newwin(height + 2, width + 2, start_y, start_x)
         self.init_colors()
         self._win.border()

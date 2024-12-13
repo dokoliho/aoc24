@@ -10,8 +10,11 @@ class Solution:
         self.expected_test_result_part_2 = 2
 
     def read_puzzle(self, filename):
-        with open(filename) as file:
-            self.puzzle = [line.strip() for line in file]
+        try:
+            with open(f"../inputs/{filename}") as file:
+                self.puzzle = [line.strip() for line in file]
+        except FileNotFoundError:
+            print(f"File {filename} not found.")
 
     def solve_part_1(self):
         return 1
