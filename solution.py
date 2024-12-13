@@ -11,7 +11,7 @@ class Solution:
 
     def read_puzzle(self, filename):
         try:
-            with open(f"../inputs/{filename}") as file:
+            with open(f"{filename}", "r") as file:
                 self.puzzle = [line.strip() for line in file]
         except FileNotFoundError:
             print(f"File {filename} not found.")
