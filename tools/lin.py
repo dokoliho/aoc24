@@ -5,7 +5,9 @@ def solve_linear_system_manual(ax, bx, ay, by, dx, dy):
     # Step 1: Compute determinant
     det = ax * by - ay * bx
     if det == 0:
-        raise ValueError("No unique solution exists (determinant is zero).")
+        a, b = (dx // ax, 0) if ax > bx else (0, dy // by)
+        return (a, b) if a * ax + b * bx == dx and a * ay + b * by == dy else None
+
 
     # Step 2: Check divisibility
     num_a = dx * by - dy * bx
@@ -22,8 +24,8 @@ def solve_linear_system_manual(ax, bx, ay, by, dx, dy):
 
 
 # Example usage
-ax, bx, ay, by = 94, 22, 34, 67
-dx, dy = 8400, 5400
+ax, bx, ay, by = 2, 1, 2, 1
+dx, dy = 50, 51
 
 a, b = solve_linear_system_manual(ax, bx, ay, by, dx, dy)
 print(f"Solution: a = {a}, b = {b}")

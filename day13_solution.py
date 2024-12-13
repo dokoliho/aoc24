@@ -15,7 +15,9 @@ class D13S(Solution):
             cost_a, ax, ay = self._button_a
             cost_b, bx, by = self._button_b
             det = ax * by - ay * bx
-            if det == 0: return None # No unique solution exists (determinant is zero)
+            if det == 0: # Both equations are linearly dependent
+                a, b = (dx // ax, 0) if ax > bx else (0, dy // by)
+                return (a, b, a * cost_a + b * cost_b) if a * ax + b * bx == dx and a * ay + b * by == dy else None
             num_a = dx * by - dy * bx
             num_b = dy * ax - dx * ay
             if num_a % det != 0 or num_b % det != 0: return None # No integer solution exists
