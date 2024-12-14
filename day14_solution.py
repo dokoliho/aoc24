@@ -3,7 +3,8 @@ from functools import reduce
 from operator import mul
 
 from aoc_tools.solution import Solution
-from collections import Counter
+from collections import Counter, defaultdict
+
 
 class D14S(Solution):
 
@@ -91,29 +92,33 @@ class D14S(Solution):
     def is_possible_solutuion(self, robots):
         # My solution
         # A Xmax tree consists of at least a single line with more then 10 robots
-        robots =set([robot[0] for robot in robots])
-        return self.max_line_length(robots) > 10
+        robot_rows = defaultdict(list)
+        for robot in robots:
+            row = (robot[0][1] + self.height) % self.height
+            col = (robot[0][0] + self.width) % self.width
+            robot_rows[row].append(col)
+        max_segments = [self.max_segment(sorted(row)) for row in robot_rows.values()]
+        return max(max_segments) > 10
 
         # Reddit solution
         #counter = Counter([robot[0] for robot in robots])
         #return len(counter) == len(robots)
 
-    def max_line_length(self, robot_set):
-        return max(self.max_segment(robot_set, row) for row in range(self.height))
+    def max_line_length(self, robot_rows):
+        return max(self.max_segment(row) for row in robot_rows.values())
 
-    def max_segment(self, robot_set, row):
-        start = None
-        col = 0
-        max_length = 0
-        while col < self.width:
-            if (col, row) in robot_set:
-                if start is None:
-                    start = col
-                max_length = (max(max_length, col - start + 1))
+    def max_segment(self, robot_row):
+        if len(robot_row) == 0:  # Leere Liste prüfen
+            return 0
+        longest = 0
+        current = 1
+        for i in range(1, len(robot_row)):
+            longest = max(longest, current)
+            if robot_row[i] == robot_row[i - 1] + 1:  # Folge ist zusammenhängend
+                current += 1
             else:
-                start = None
-            col += 1
-        return max_length
+                current = 1
+        return longest
 
     def display(self, robots, step):
         print(f"Step {step}")
