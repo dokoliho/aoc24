@@ -28,14 +28,14 @@ class D14S(Solution):
         # the size of the grid are prime numbers, so the cycle is the product of the grid size
         cycle = self.width * self.height
         step = 0
-        count_candidates = 0
+        possible_solutions = []
         while step <= cycle:
             if self.is_possible_solutuion(robots):
                 self.display(robots, step)
-                count_candidates += 1
+                possible_solutions.append(step)
             robots = [self.move_robot(robot, 1) for robot in robots]
             step += 1
-        return count_candidates
+        return possible_solutions[0] if len(possible_solutions) > 0 else 0
 
     def set_size(self):
         self.width, self.height = (11,7) if self.is_test else (101,103)
