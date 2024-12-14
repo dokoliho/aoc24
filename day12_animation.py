@@ -1,6 +1,5 @@
-import curses
 from day12_solution import D12S
-from animation import Animation
+from aoc_tools.animation import Animation
 
 
 class Animated_D12S(D12S):
@@ -34,4 +33,4 @@ if __name__ == "__main__":
     animation = D12S_Animation(Animated_D12S())
     animation.set_part(1)
     animation.set_test_input(False)
-    curses.wrapper(animation.run)
+    animation.run()

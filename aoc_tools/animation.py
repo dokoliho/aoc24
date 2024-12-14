@@ -73,7 +73,10 @@ class Animation:
             self._win.refresh()
             self._win = None
 
-    def run(self, stdscr):
+    def run(self):
+        curses.wrapper(self.main)
+
+    def main(self, stdscr):
         stdscr.clear()
         self._rows, self._cols = stdscr.getmaxyx()
         if self._test_input:
@@ -98,4 +101,4 @@ class Animation:
 
 if __name__ == "__main__":
     animation = Animation(None)
-    curses.wrapper(animation.run)
+    animation.run()
