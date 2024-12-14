@@ -93,28 +93,26 @@ class D14S(Solution):
         # My solution
         # A Xmax tree consists of at least a single line with more then 10 robots
         robot_rows = defaultdict(list)
-        for robot in robots:
-            row = (robot[0][1] + self.height) % self.height
-            col = (robot[0][0] + self.width) % self.width
+        for pos, _ in robots:
+            row = pos[1] % self.height
+            col = pos[0] % self.width
             robot_rows[row].append(col)
-        max_segments = [self.max_segment(sorted(row)) for row in robot_rows.values()]
+        max_segments = [self.max_segment(sorted(col_list)) for col_list in robot_rows.values()]
         return max(max_segments) > 10
 
         # Reddit solution
         #counter = Counter([robot[0] for robot in robots])
         #return len(counter) == len(robots)
 
-    def max_line_length(self, robot_rows):
-        return max(self.max_segment(row) for row in robot_rows.values())
 
-    def max_segment(self, robot_row):
-        if len(robot_row) == 0:  # Leere Liste prüfen
+    def max_segment(self, sorted_cols):
+        if len(sorted_cols) == 0:  # Leere Liste prüfen
             return 0
         longest = 0
         current = 1
-        for i in range(1, len(robot_row)):
+        for i in range(1, len(sorted_cols)):
             longest = max(longest, current)
-            if robot_row[i] == robot_row[i - 1] + 1:  # Folge ist zusammenhängend
+            if sorted_cols[i] == sorted_cols[i - 1] + 1:  # Folge ist zusammenhängend
                 current += 1
             else:
                 current = 1
