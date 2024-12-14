@@ -11,7 +11,7 @@ class D14S(Solution):
         super().__init__()
         self.day = 14
         self.expected_test_result_part_1 = 12
-        self.expected_test_result_part_2 = 2
+        self.expected_test_result_part_2 = 0
         self.width = None
         self.height = None
 
@@ -24,14 +24,18 @@ class D14S(Solution):
     def solve_part_2(self):
         self.set_size()
         robots = self.get_robots()
-        cycle = self.cycle_all(robots)
+        # cycle = self.cycle_all(robots)
+        # the size of the grid are prime numbers, so the cycle is the product of the grid size
+        cycle = self.width * self.height
         step = 0
+        count_candidates = 0
         while step <= cycle:
             if self.is_possible_solutuion(robots):
                 self.display(robots, step)
+                count_candidates += 1
             robots = [self.move_robot(robot, 1) for robot in robots]
             step += 1
-        return 2
+        return count_candidates
 
     def set_size(self):
         self.width, self.height = (11,7) if self.is_test else (101,103)
@@ -51,17 +55,19 @@ class D14S(Solution):
     def get_values(self, part):
         return tuple(map(int, part.split("=")[1].split(",")))
 
-    def split_quadrants(self, robots):
-        positions = [(robot[0][0]+self.width % self.width,
-                        robot[0][1]+self.height % self.height)
-                     for robot in robots]
-        q1 = self.robots_in_area(robots, 0, 0, (self.width // 2) - 1, (self.height // 2) - 1)
-        q2 = self.robots_in_area(robots, (self.width // 2) + 1, 0, self.width - 1, (self.height // 2) - 1)
-        q3 = self.robots_in_area(robots, 0, (self.height // 2) + 1, (self.width // 2) - 1, self.height - 1)
-        q4 = self.robots_in_area(robots, (self.width // 2) + 1, (self.height // 2) + 1, self.width - 1, self.height - 1)
-        return q1, q2, q3, q4
 
-    def robots_in_area(self ,robots, x1, y1, x2, y2):
+    def split_quadrants(self, robots):
+        mid_w, mid_h = self.width // 2, self.height // 2
+        quadrants = [
+            (0, 0, mid_w - 1, mid_h - 1),
+            (mid_w + 1, 0, self.width - 1, mid_h - 1),
+            (0, mid_h + 1, mid_w - 1, self.height - 1),
+            (mid_w + 1, mid_h + 1, self.width - 1, self.height - 1),
+        ]
+        return tuple(self.robots_in_area(robots, q) for q in quadrants)
+
+    def robots_in_area(self ,robots, rect):
+        x1, y1, x2, y2 = rect
         positions = [(robot[0][0]+self.width % self.width,
                         robot[0][1]+self.height % self.height)
                      for robot in robots]
@@ -83,9 +89,31 @@ class D14S(Solution):
         return abs(a * b) // math.gcd(a, b)
 
     def is_possible_solutuion(self, robots):
-        counter = Counter([robot[0] for robot in robots])
+        # My solution
+        # A Xmax tree consists of at least a single line with more then 10 robots
+        robots =set([robot[0] for robot in robots])
+        return self.max_line_length(robots) > 10
+
         # Reddit solution
-        return len(counter) == len(robots)
+        #counter = Counter([robot[0] for robot in robots])
+        #return len(counter) == len(robots)
+
+    def max_line_length(self, robot_set):
+        return max(self.max_segment(robot_set, row) for row in range(self.height))
+
+    def max_segment(self, robot_set, row):
+        start = None
+        col = 0
+        max_length = 0
+        while col < self.width:
+            if (col, row) in robot_set:
+                if start is None:
+                    start = col
+                max_length = (max(max_length, col - start + 1))
+            else:
+                start = None
+            col += 1
+        return max_length
 
     def display(self, robots, step):
         print(f"Step {step}")
