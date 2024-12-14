@@ -1,4 +1,4 @@
-from solution import Solution
+from aoc_tools.solution import Solution
 from functools import cmp_to_key
 
 class Day05Solution(Solution):

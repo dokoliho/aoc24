@@ -1,11 +1,10 @@
-from collections import defaultdict
-from solution import Solution
+from aoc_tools.solution import Solution
 
-class D13S(Solution):
+class D00S(Solution):
 
     def __init__(self):
         super().__init__()
-        self.day = 13
+        self.day = 00
         self.expected_test_result_part_1 = 1
         self.expected_test_result_part_2 = 2
 
@@ -17,5 +16,5 @@ class D13S(Solution):
 
 
 if __name__ == "__main__":
-    D13S().test()
-    D13S().solve()
+    D00S().test()
+    D00S().solve()

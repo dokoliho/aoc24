@@ -1,5 +1,5 @@
 from collections import defaultdict
-from solution import Solution
+from aoc_tools.solution import Solution
 
 DIRECTIONS = { "UP": (0, -1), "DOWN": (0, 1), "LEFT": (-1, 0), "RIGHT": (1, 0) }
 

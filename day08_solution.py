@@ -1,4 +1,4 @@
-from solution import Solution
+from aoc_tools.solution import Solution
 from collections import defaultdict
 from itertools import combinations
 import math

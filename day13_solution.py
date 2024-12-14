@@ -1,5 +1,4 @@
-from solution import Solution
-
+from aoc_tools.solution import Solution
 
 class D13S(Solution):
 

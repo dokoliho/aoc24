@@ -1,4 +1,4 @@
-from solution import Solution
+from aoc_tools.solution import Solution
 import itertools
 
 class Day02Solution(Solution):

@@ -1,4 +1,4 @@
-from solution import Solution
+from aoc_tools.solution import Solution
 from functools import cache
 
 class D11S(Solution):

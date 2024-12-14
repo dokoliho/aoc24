@@ -1,4 +1,4 @@
-from solution import Solution
+from aoc_tools.solution import Solution
 
 DIRECTIONS = [(0, -1), (1, 0), (0, 1), (-1, 0)]
 
