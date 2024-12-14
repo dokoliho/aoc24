@@ -3,7 +3,10 @@ from aoc_tools.animation import Animation
 from collections import Counter
 import time
 
+OFFSET = 15
+
 class Animated_D14S(D14S):
+
 
     def display(self, robots, step):
         ani = Animation.instance
