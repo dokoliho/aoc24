@@ -7,7 +7,7 @@ class D15S(Solution):
         super().__init__()
         self.day = 15
         self.expected_test_result_part_1 = 10092
-        self.expected_test_result_part_2 = 2
+        self.expected_test_result_part_2 = 9021
         self.path = ""
         self.map = {}
         self.robot = None
@@ -18,13 +18,30 @@ class D15S(Solution):
         self.get_map_and_path()
         for direction in self.path:
             self.make_step(direction)
-        result = self.sum_of_coordinates()
+        result = self.sum_of_coordinates("O")
         return result
 
     def solve_part_2(self):
-        return 2
+        # self.puzzle = [
+        #     "#######",
+        #     "#...#.#",
+        #     "#.....#",
+        #     "#..OO@#",
+        #     "#..O..#",
+        #     "#.....#",
+        #     "#######",
+        #     "",
+        #     "<vv<<^^<<^^",
+        # ]
+        self.get_map2_and_path()
+        for direction in self.path:
+            self.make_step2(direction)
+        result = self.sum_of_coordinates("[")
+        return result
 
     def get_map_and_path(self):
+        self.map = {}
+        self.path = ""
         path_section = False
         for row, line in enumerate(self.puzzle):
             if line == "":
@@ -40,6 +57,29 @@ class D15S(Solution):
                         self.map[(col,row)] = char
                     elif char == "@":
                         self.robot =(col,row)
+
+    def get_map2_and_path(self):
+        self.map = {}
+        self.path = ""
+        path_section = False
+        for row, line in enumerate(self.puzzle):
+            if line == "":
+                self.height = row
+                self.width = len(self.puzzle[0]) * 2
+                path_section = True
+                continue
+            if path_section:
+                self.path += line
+            else:
+                for col, char in enumerate(line):
+                    if char == "#":
+                        self.map[(col*2,row)] = char
+                        self.map[(col*2+1,row)] = char
+                    elif char == "O":
+                        self.map[(col*2,row)] = "["
+                        self.map[(col*2+1,row)] = "]"
+                    elif char == "@":
+                        self.robot =(col*2,row)
 
     def display_map(self):
         for row in range(self.height):
@@ -110,9 +150,68 @@ class D15S(Solution):
         raise ValueError(f"Invalid direction {direction}")
 
 
-    def sum_of_coordinates(self):
-        coordinates = [p for p in self.map if self.map[p] == "O"]
+    def sum_of_coordinates(self, char):
+        coordinates = [p for p in self.map if self.map[p] == char]
         return sum([p[1]*100+p[0] for p in coordinates])
+
+
+    def make_step2(self, direction):
+        dx, dy = self.get_direction(direction)
+        new_robot = (self.robot[0]+dx, self.robot[1]+dy)
+        if not self.is_movable(new_robot, dx, dy):
+            return
+        self.move(new_robot, dx, dy)
+        self.robot = new_robot
+
+    def is_movable(self, pos, dx, dy):
+        if pos not in self.map:
+            return True
+        if self.map[pos] == "#":
+            return False
+        char = self.map[pos]
+        pos = (pos[0]+dx, pos[1]+dy)
+        if dy == 0:
+            return self.is_movable(pos, dx, dy)
+        else:
+            if char == "[":
+                peer = (pos[0]+1, pos[1])
+            else:
+                peer = (pos[0]-1, pos[1])
+            return (self.is_movable(pos, dx, dy) and
+                    self.is_movable(peer, dx, dy))
+
+    def move(self, pos, dx, dy):
+        if pos not in self.map:
+            return
+        if self.map[pos] == "#":
+            raise ValueError("Cannot move to wall")
+        if dy == 0:
+            self.move_on_element(pos, dx, dy)
+        else:
+            if self.map[pos] == "[":
+                peer = (pos[0]+1, pos[1])
+            else:
+                peer = (pos[0]-1, pos[1])
+            self.move_on_element(pos, dx, dy)
+            self.move_on_element(peer, dx, dy)
+
+    def move_on_element(self, pos, dx, dy):
+        char = self.map[pos]
+        del (self.map[pos])
+        pos = (pos[0] + dx, pos[1] + dy)
+        self.move(pos, dx, dy)
+        self.map[pos] = char
+
+    def get_direction(self, direction):
+        if direction in "^":
+            return 0, -1
+        elif direction in "v":
+            return 0, 1
+        elif direction in "<":
+            return -1, 0
+        elif direction in ">":
+            return 1, 0
+        raise ValueError(f"Invalid direction {direction}")
 
 
 if __name__ == "__main__":
