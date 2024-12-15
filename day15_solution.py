@@ -8,8 +8,8 @@ class D15S(Solution):
         self.day = 15
         self.expected_test_result_part_1 = 10092
         self.expected_test_result_part_2 = 9021
-        self.path = ""
-        self.map = {}
+        self.path = None
+        self.map = None
         self.robot = None
         self.height = None
         self.width = None
@@ -17,14 +17,14 @@ class D15S(Solution):
     def solve_part_1(self):
         self.get_map_and_path()
         for direction in self.path:
-            self.make_step2(direction)
+            self.make_step(direction)
         result = self.sum_of_coordinates("O")
         return result
 
     def solve_part_2(self):
         self.get_map_and_path(part_2=True)
         for direction in self.path:
-            self.make_step2(direction)
+            self.make_step(direction)
         result = self.sum_of_coordinates("[")
         return result
 
@@ -65,69 +65,11 @@ class D15S(Solution):
                     print(self.map[pos], end="")
             print()
 
-    def get_row_map(self, row_num):
-        return sorted([(o[0], self.map[o]) for o in self.map if o[1] == row_num], key=lambda x: x[0])
-
-    def get_col_map(self, col_num):
-        return sorted([(o[1], self.map[o]) for o in self.map if o[0] == col_num], key=lambda x: x[0])
-
-    def make_step(self, direction):
-        obj, selector, delta, get_pos = self.get_affected_objects(direction)
-        wall = next((i for i, o in enumerate(obj) if o[1] == "#"), None)
-        while wall>0 and abs(obj[wall-1][0] - obj[wall][0]) == 1:
-            wall -= 1
-        if obj[wall][0] == self.robot[selector]+delta:
-            return # no movement, wall ahead
-        obj = obj[:wall]
-        index = 0
-        pusher = list(self.robot)
-        inserts = []
-        while index < len(obj) and obj[index][0] == pusher[selector]+delta:
-            old_pos = get_pos(obj[index][0])
-            new_pos = get_pos(obj[index][0] + delta)
-            del(self.map[old_pos])
-            inserts.append((new_pos, obj[index][1]))
-            pusher[selector] += delta
-            index += 1
-
-        for pos, char in inserts:
-            self.map[pos] = char
-
-        new_robot_pos = list(self.robot)
-        new_robot_pos[selector] = new_robot_pos[selector]+delta
-        self.robot = tuple(new_robot_pos)
-
-
-    def get_affected_objects(self, direction):
-        if direction in "^":
-            line = self.get_col_map(self.robot[0])
-            line = list(reversed([o for o in line if o[0] < self.robot[1]]))
-            get_pos = lambda x: (self.robot[0],x)
-            return  line, 1, -1, get_pos
-        elif direction in "v":
-            line = self.get_col_map(self.robot[0])
-            line = [o for o in line if o[0] > self.robot[1]]
-            get_pos = lambda x: (self.robot[0],x)
-            return line, 1, 1, get_pos
-        elif direction in "<":
-            line = self.get_row_map(self.robot[1])
-            line = list(reversed([o for o in line if o[0] < self.robot[0]]))
-            get_pos = lambda x: (x,self.robot[1])
-            return line, 0, -1, get_pos
-        elif direction in ">":
-            line = self.get_row_map(self.robot[1])
-            line = [o for o in line if o[0] > self.robot[0]]
-            get_pos = lambda x: (x,self.robot[1])
-            return line, 0, 1, get_pos
-        raise ValueError(f"Invalid direction {direction}")
-
-
     def sum_of_coordinates(self, char):
         coordinates = [p for p in self.map if self.map[p] == char]
         return sum([p[1]*100+p[0] for p in coordinates])
 
-
-    def make_step2(self, direction):
+    def make_step(self, direction):
         dx, dy = self.get_direction(direction)
         new_robot = (self.robot[0]+dx, self.robot[1]+dy)
         if not self.is_movable(new_robot, dx, dy):
@@ -149,8 +91,7 @@ class D15S(Solution):
                 peer = (pos[0]+1, pos[1])
             else:
                 peer = (pos[0]-1, pos[1])
-            return (self.is_movable(pos, dx, dy) and
-                    self.is_movable(peer, dx, dy))
+            return self.is_movable(pos, dx, dy) and self.is_movable(peer, dx, dy)
 
     def move(self, pos, dx, dy):
         if pos not in self.map:
