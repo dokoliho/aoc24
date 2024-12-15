@@ -11,6 +11,11 @@ class Animated_D15S(D15S):
         super().__init__()
         self.visualizations = True
 
+    def get_map_and_path(self, part_2=False):
+        super().get_map_and_path(part_2)
+        ani = Animation.instance
+        ani.wait_for_key()
+
     def display_map(self):
         ani = Animation.instance
         for row in range(self.height):
