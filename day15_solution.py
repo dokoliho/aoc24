@@ -13,11 +13,14 @@ class D15S(Solution):
         self.robot = None
         self.height = None
         self.width = None
+        self.visualizations = False
 
     def solve_part_1(self):
         self.get_map_and_path()
         for direction in self.path:
             self.make_step(direction)
+            if self.visualizations:
+                self.display_map()
         result = self.sum_of_coordinates("O")
         return result
 
@@ -25,6 +28,8 @@ class D15S(Solution):
         self.get_map_and_path(part_2=True)
         for direction in self.path:
             self.make_step(direction)
+            if self.visualizations:
+                self.display_map()
         result = self.sum_of_coordinates("[")
         return result
 

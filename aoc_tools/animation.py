@@ -64,6 +64,12 @@ class Animation:
     def output(self, x, y, text, color=0):
         self.win.addstr(y + 1, x + 1, text, curses.color_pair(color))
 
+    def output_reverse(self, x, y, text, color=0):
+        self.win.addstr(y + 1, x + 1, text, curses.color_pair(color) | curses.A_REVERSE)
+
+    def output_bold(self, x, y, text, color=0):
+        self.win.addstr(y + 1, x + 1, text, curses.color_pair(color) | curses.A_BOLD)
+
     def close_window(self):
         if self._win is not None:
             while True:
