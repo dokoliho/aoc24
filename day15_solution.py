@@ -17,55 +17,27 @@ class D15S(Solution):
     def solve_part_1(self):
         self.get_map_and_path()
         for direction in self.path:
-            self.make_step(direction)
+            self.make_step2(direction)
         result = self.sum_of_coordinates("O")
         return result
 
     def solve_part_2(self):
-        # self.puzzle = [
-        #     "#######",
-        #     "#...#.#",
-        #     "#.....#",
-        #     "#..OO@#",
-        #     "#..O..#",
-        #     "#.....#",
-        #     "#######",
-        #     "",
-        #     "<vv<<^^<<^^",
-        # ]
-        self.get_map2_and_path()
+        self.get_map_and_path(part_2=True)
         for direction in self.path:
             self.make_step2(direction)
         result = self.sum_of_coordinates("[")
         return result
 
-    def get_map_and_path(self):
+    def get_map_and_path(self, part_2=False):
         self.map = {}
         self.path = ""
+        factor = 1 if not part_2 else 2
+        box_shape = ["O"] if not part_2 else ["[","]"]
         path_section = False
         for row, line in enumerate(self.puzzle):
             if line == "":
                 self.height = row
-                self.width = len(self.puzzle[0])
-                path_section = True
-                continue
-            if path_section:
-                self.path += line
-            else:
-                for col, char in enumerate(line):
-                    if char == "#" or char == "O":
-                        self.map[(col,row)] = char
-                    elif char == "@":
-                        self.robot =(col,row)
-
-    def get_map2_and_path(self):
-        self.map = {}
-        self.path = ""
-        path_section = False
-        for row, line in enumerate(self.puzzle):
-            if line == "":
-                self.height = row
-                self.width = len(self.puzzle[0]) * 2
+                self.width = len(self.puzzle[0]) * factor
                 path_section = True
                 continue
             if path_section:
@@ -73,13 +45,13 @@ class D15S(Solution):
             else:
                 for col, char in enumerate(line):
                     if char == "#":
-                        self.map[(col*2,row)] = char
-                        self.map[(col*2+1,row)] = char
-                    elif char == "O":
-                        self.map[(col*2,row)] = "["
-                        self.map[(col*2+1,row)] = "]"
+                        for i in range(factor):
+                            self.map[(col*factor+i,row)] = char
+                    if char == "O":
+                        for i in range(factor):
+                            self.map[(col*factor+i,row)] = box_shape[i]
                     elif char == "@":
-                        self.robot =(col*2,row)
+                        self.robot =(col*factor,row)
 
     def display_map(self):
         for row in range(self.height):
@@ -170,7 +142,7 @@ class D15S(Solution):
             return False
         char = self.map[pos]
         pos = (pos[0]+dx, pos[1]+dy)
-        if dy == 0:
+        if dy == 0 or char == "O":
             return self.is_movable(pos, dx, dy)
         else:
             if char == "[":
@@ -183,19 +155,20 @@ class D15S(Solution):
     def move(self, pos, dx, dy):
         if pos not in self.map:
             return
-        if self.map[pos] == "#":
+        char = self.map[pos]
+        if char == "#":
             raise ValueError("Cannot move to wall")
-        if dy == 0:
-            self.move_on_element(pos, dx, dy)
+        if dy == 0 or char == "O":
+            self.push_one_pos(pos, dx, dy)
         else:
             if self.map[pos] == "[":
                 peer = (pos[0]+1, pos[1])
             else:
                 peer = (pos[0]-1, pos[1])
-            self.move_on_element(pos, dx, dy)
-            self.move_on_element(peer, dx, dy)
+            self.push_one_pos(pos, dx, dy)
+            self.push_one_pos(peer, dx, dy)
 
-    def move_on_element(self, pos, dx, dy):
+    def push_one_pos(self, pos, dx, dy):
         char = self.map[pos]
         del (self.map[pos])
         pos = (pos[0] + dx, pos[1] + dy)
