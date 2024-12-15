@@ -29,6 +29,7 @@ class Animated_D15S(D15S):
                     else:
                         ani.output(col, row, " ", 2)
         ani.win.refresh()
+        time.sleep(0.01)
 
 
 

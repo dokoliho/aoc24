@@ -54,9 +54,9 @@ class Animation:
     def create_window(self, width, height):
         start_y, start_x = (self._rows - height - 2) // 2, (self._cols - width - 2) // 2
         if start_y < 0:
-            raise ValueError("Window height too large. Resize terminal.")
+            raise ValueError(f"Window height too large ({height}). Resize terminal.")
         if start_x < 0:
-            raise ValueError("Window width too large. Resize terminal.")
+            raise ValueError(f"Window width too large ({width}). Resize terminal.")
         self._win = curses.newwin(height + 2, width + 2, start_y, start_x)
         self.init_colors()
         self._win.border()
