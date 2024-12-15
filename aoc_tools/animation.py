@@ -17,6 +17,7 @@ class Animation:
         Animation.instance = self
         self._solution = solution
         self._win = None
+        self._stdscr = None
         self._rows = 0
         self._cols = 0
         self._test_input = False
@@ -79,10 +80,21 @@ class Animation:
             self._win.refresh()
             self._win = None
 
+    def wait_for_key(self):
+        self._stdscr.addstr(0, 0, "Press space to continue")
+        self._stdscr.refresh()
+        while True:
+            key = self._stdscr.getkey()
+            if key == ' ': break
+        self._stdscr.move(0, 0)
+        self._stdscr.clrtoeol()
+        self._stdscr.refresh()
+
     def run(self):
         curses.wrapper(self.main)
 
     def main(self, stdscr):
+        self._stdscr = stdscr
         stdscr.clear()
         self._rows, self._cols = stdscr.getmaxyx()
         if self._test_input:
