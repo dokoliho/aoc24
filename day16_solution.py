@@ -47,19 +47,26 @@ class D16S(Solution):
         heappush(queue, (0, (self.start, direction), None))
         while queue:
             dist, node, pred = heappop(queue)
+            # is dist worse than best? if so, break
             if best and dist > best:
                 break
+            # same node from same pred already visited -> skip
+            # (e.g. U-turns in clockwise direction and counter clockwise direction)
             if (dist, pred) in visited[node]:
                 continue
+            # same node with less cost already visited -> skip
             if node in visited_cost:
                 if visited_cost[node] < dist:
                     continue
+            # add to visited
             visited[node].add((dist, pred))
             visited_cost[node] = dist
+            # check if end reached
             pos, direction = node
             if pos == self.end:
                 best = dist
                 continue
+            # add next steps to queue
             step_ahead_pos = (pos[0] + DIRECTIONS[direction][0], pos[1] + DIRECTIONS[direction][1])
             if step_ahead_pos not in self.walls:
                 heappush(queue, (dist + 1, (step_ahead_pos, direction), node))
