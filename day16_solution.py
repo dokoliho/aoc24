@@ -40,6 +40,7 @@ class D16S(Solution):
 
     def find_shortest_path(self):
         visited = defaultdict(set)
+        visited_cost = {}
         direction = 0
         queue = []
         best = None
@@ -48,11 +49,13 @@ class D16S(Solution):
             dist, node, pred = heappop(queue)
             if best and dist > best:
                 break
-            if node in visited:
-                known_pred =  next(iter(visited[node]))
-                if known_pred[0] < dist:
+            if (dist, pred) in visited[node]:
+                continue
+            if node in visited_cost:
+                if visited_cost[node] < dist:
                     continue
             visited[node].add((dist, pred))
+            visited_cost[node] = dist
             pos, direction = node
             if pos == self.end:
                 best = dist
