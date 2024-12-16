@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 from aoc_tools.solution import Solution
 from heapq import heappop, heappush
 
@@ -37,22 +39,20 @@ class D16S(Solution):
                     self.end = (col, row)
 
     def find_shortest_path(self):
-        visited = {}
+        visited = defaultdict(set)
         direction = 0
         queue = []
         best = None
         heappush(queue, (0, (self.start, direction), None))
         while queue:
             dist, node, pred = heappop(queue)
+            if best and dist > best:
+                break
             if node in visited:
                 known_pred =  next(iter(visited[node]))
                 if known_pred[0] < dist:
                     continue
-            else:
-                visited[node] = set()
             visited[node].add((dist, pred))
-            if best and dist > best:
-                break
             pos, direction = node
             if pos == self.end:
                 best = dist
