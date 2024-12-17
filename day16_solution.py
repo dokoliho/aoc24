@@ -39,8 +39,8 @@ class D16S(Solution):
                     self.end = (col, row)
 
     def find_shortest_path(self):
-        visited = defaultdict(set)
-        visited_cost = {}
+        predecessors = defaultdict(set)
+        distances = {}
         direction = 0
         queue = []
         best = None
@@ -52,15 +52,15 @@ class D16S(Solution):
                 break
             # same node from same pred already visited -> skip
             # (e.g. U-turns in clockwise direction and counter clockwise direction)
-            if (dist, pred) in visited[node]:
+            if pred in predecessors[node]:
                 continue
             # same node with less cost already visited -> skip
-            if node in visited_cost:
-                if visited_cost[node] < dist:
+            if node in distances:
+                if distances[node] < dist:
                     continue
             # add to visited
-            visited[node].add((dist, pred))
-            visited_cost[node] = dist
+            predecessors[node].add(pred)
+            distances[node] = dist
             # check if end reached
             pos, direction = node
             if pos == self.end:
@@ -72,7 +72,7 @@ class D16S(Solution):
                 heappush(queue, (dist + 1, (step_ahead_pos, direction), node))
             heappush(queue, (dist + 1000, (pos, (direction + 1) % 4), node))
             heappush(queue, (dist + 1000, (pos, (direction - 1) % 4), node))
-        return best, visited
+        return best, {node:(distances[node], predecessors[node]) for node in predecessors}
 
     def get_tiles(self, visited):
         tiles = set()
@@ -85,7 +85,7 @@ class D16S(Solution):
         if node and node in visited:
             pos, _ = node
             tiles.add(pos)
-            for _, pred in visited[node]:
+            for pred in visited[node][1]:
                 tiles = self.get_tiles_from_node(pred, visited, tiles)
         return tiles
 
