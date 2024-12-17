@@ -58,8 +58,7 @@ class D16S(Solution):
             if node in distances and distances[node] < dist:
                 continue
             # add to visited
-            predecessors[node].add(pred)
-            distances[node] = dist
+            self.mark_visited(node, dist, pred, predecessors, distances)
             # check if end reached
             pos, direction = node
             if pos == self.end:
@@ -73,10 +72,9 @@ class D16S(Solution):
             heappush(queue, (dist + 1000, (pos, (direction - 1) % 4), node))
         return best, predecessors
 
-    def mark_visited(self, node, visited, visited_cost, dist, pred):
-        visited[node].add((dist, pred))
-        visited_cost[node] = dist
-        return visited, visited_cost
+    def mark_visited(self, node, dist, pred, predecessors, distances):
+        predecessors[node].add(pred)
+        distances[node] = dist
 
     def get_tiles(self, predecessors):
         tiles = set()
