@@ -31,7 +31,7 @@ class D14S(Solution):
         step = 0
         possible_solutions = []
         while step <= cycle:
-            if self.is_possible_solutuion(robots):
+            if self.is_possible_solution(robots):
                 self.display(robots, step)
                 possible_solutions.append(step)
             robots = [self.move_robot(robot, 1) for robot in robots]
@@ -89,7 +89,7 @@ class D14S(Solution):
     def lcm(self, a, b):
         return abs(a * b) // math.gcd(a, b)
 
-    def is_possible_solutuion(self, robots):
+    def is_possible_solution(self, robots):
         # My solution
         # A Xmax tree consists of at least a single line with more then 10 robots
         robot_rows = defaultdict(list)
