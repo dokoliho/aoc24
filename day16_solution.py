@@ -73,13 +73,12 @@ class D16S(Solution):
             heappush(queue, (dist + 1000, (pos, (direction - 1) % 4), node))
         return best, predecessors
 
-    def get_tiles(self, predecessors):
     def mark_visited(self, node, visited, visited_cost, dist, pred):
         visited[node].add((dist, pred))
         visited_cost[node] = dist
         return visited, visited_cost
 
-    def get_tiles(self, visited):
+    def get_tiles(self, predecessors):
         tiles = set()
         for direction in range(4):
             node = (self.end, direction)
