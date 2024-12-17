@@ -23,9 +23,8 @@ class Animated_D16S(D16S):
                     ani.output(col, row, " ", 8)
             ani.win.refresh()
 
-
-    def mark_visited(self, node, visited, visited_cost, dist, pred):
-        visited, visited_cost = super().mark_visited(node, visited, visited_cost, dist, pred)
+    def mark_visited(self, node, dist, pred, predecessors, distances):
+        super().mark_visited(node, dist, pred, predecessors, distances)
         ani = Animation.instance
         pos, direction = node
         if pos != self.start:
@@ -33,11 +32,11 @@ class Animated_D16S(D16S):
             ani.output(col, row, "O", 4)
             ani.win.refresh()
             time.sleep(0.001)
-        return visited, visited_cost
 
-    def get_tiles_from_node(self, node, visited, tiles):
+
+    def get_tiles_from_node(self, node, predecessors, tiles):
         ani = Animation.instance
-        if node and node in visited:
+        if node and node in predecessors:
             pos, _ = node
             if pos not in tiles:
                 tiles.add(pos)
@@ -45,10 +44,9 @@ class Animated_D16S(D16S):
                 ani.output(col, row, "X", 14)
                 ani.win.refresh()
                 time.sleep(0.001)
-            for _, pred in visited[node]:
-                tiles = self.get_tiles_from_node(pred, visited, tiles)
+            for pred in predecessors[node]:
+                tiles = self.get_tiles_from_node(pred, predecessors, tiles)
         return tiles
-
 
 
 class D15S_Animation(Animation):
