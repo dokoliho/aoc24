@@ -23,8 +23,8 @@ class D16S(Solution):
 
     def solve_part_2(self):
         self.get_walls_start_end()
-        _, visited = self.find_shortest_path()
-        result = len(self.get_tiles(visited))
+        _, predecessors = self.find_shortest_path()
+        result = len(self.get_tiles(predecessors))
         return result
 
     def get_walls_start_end(self):
@@ -55,9 +55,8 @@ class D16S(Solution):
             if pred in predecessors[node]:
                 continue
             # same node with less cost already visited -> skip
-            if node in distances:
-                if distances[node] < dist:
-                    continue
+            if node in distances and distances[node] < dist:
+                continue
             # add to visited
             predecessors[node].add(pred)
             distances[node] = dist
@@ -72,21 +71,21 @@ class D16S(Solution):
                 heappush(queue, (dist + 1, (step_ahead_pos, direction), node))
             heappush(queue, (dist + 1000, (pos, (direction + 1) % 4), node))
             heappush(queue, (dist + 1000, (pos, (direction - 1) % 4), node))
-        return best, {node:(distances[node], predecessors[node]) for node in predecessors}
+        return best, predecessors
 
-    def get_tiles(self, visited):
+    def get_tiles(self, predecessors):
         tiles = set()
         for direction in range(4):
             node = (self.end, direction)
-            tiles = self.get_tiles_from_node(node, visited, tiles)
+            tiles = self.get_tiles_from_node(node, predecessors, tiles)
         return tiles
 
-    def get_tiles_from_node(self, node, visited, tiles):
-        if node and node in visited:
+    def get_tiles_from_node(self, node, predecessors, tiles):
+        if node and node in predecessors:
             pos, _ = node
             tiles.add(pos)
-            for pred in visited[node][1]:
-                tiles = self.get_tiles_from_node(pred, visited, tiles)
+            for pred in predecessors[node]:
+                tiles = self.get_tiles_from_node(pred, predecessors, tiles)
         return tiles
 
 if __name__ == "__main__":
