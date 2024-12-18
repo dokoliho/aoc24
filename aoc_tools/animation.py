@@ -39,9 +39,16 @@ class Animation:
         curses.start_color()
         curses.use_default_colors()
 
-        for color in self.colors[1:]:
-            self.color_count += 1
-            curses.init_pair(self.color_count, color, curses.COLOR_BLACK)
+        for color in self.colors:
+            if color != curses.COLOR_BLACK:
+                self.color_count += 1
+                curses.init_pair(self.color_count, color, curses.COLOR_BLACK)
+        for color in self.colors:
+            if color != curses.COLOR_WHITE:
+                self.color_count += 1
+                curses.init_pair(self.color_count, color, curses.COLOR_WHITE)
+
+
 
     def next_color_generator(self):
         count = 0
