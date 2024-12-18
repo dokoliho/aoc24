@@ -21,7 +21,8 @@ class D18S(Solution):
             self.height = 7
             self.steps = 12
         self.get_memory()
-        return self.get_distance()
+        length, _ = self.get_distance()
+        return length
 
     def solve_part_2(self):
         if self.is_test:
@@ -33,7 +34,8 @@ class D18S(Solution):
         upper_bound = len(self.puzzle)
         while upper_bound - lower_bound > 1:
             self.steps = (upper_bound + lower_bound) // 2
-            if self.get_distance() is not None:
+            length, _ = self.get_distance()
+            if length is not None:
                 lower_bound = self.steps
             else:
                 upper_bound = self.steps
@@ -47,28 +49,37 @@ class D18S(Solution):
     def get_distance(self):
         distances = {}
         queue = []
+        predecessors = {}
         frontier = set([(0, 0)])
-        heappush(queue, (0, (0, 0)))
+        heappush(queue, (0, (0, 0), None))
         while queue:
             if len(distances) % 100 == 0:
                 pass
-            step, pos = heappop(queue)
+            step, pos, pred = heappop(queue)
             frontier.remove(pos)
             if pos in distances and distances[pos] < step:
                 continue
             distances[pos] = step
+            predecessors[pos] = pred
             if pos == (self.width - 1, self.height - 1):
-                return step
+                return step, self.get_path(pos, predecessors)
             for direction in DIRECTIONS:
                 next_pos = (pos[0] + direction[0], pos[1] + direction[1])
                 if next_pos in frontier: continue
                 if next_pos in distances: continue
                 if next_pos[0] >= 0 and next_pos[0] < self.width and next_pos[1] >= 0 and next_pos[1] < self.height:
                     if next_pos not in self.memory or self.memory[next_pos] >= self.steps:
-                        heappush(queue, (step + 1, next_pos))
+                        heappush(queue, (step + 1, next_pos, pos))
                         frontier.add(next_pos)
-        return None
+        return None, None
 
+    def get_path(self, pos, predecessors):
+        path = []
+        while pos:
+            path.append(pos)
+            pos = predecessors[pos]
+        path.reverse()
+        return path
 
 if __name__ == "__main__":
     D18S().test()
