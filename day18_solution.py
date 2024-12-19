@@ -50,7 +50,7 @@ class D18S(Solution):
         distances = {}
         queue = []
         predecessors = {}
-        frontier = set([(0, 0)])
+        frontier = {(0, 0)}
         heappush(queue, (0, (0, 0), None))
         while queue:
             if len(distances) % 100 == 0:
@@ -67,7 +67,7 @@ class D18S(Solution):
                 next_pos = (pos[0] + direction[0], pos[1] + direction[1])
                 if next_pos in frontier: continue
                 if next_pos in distances: continue
-                if next_pos[0] >= 0 and next_pos[0] < self.width and next_pos[1] >= 0 and next_pos[1] < self.height:
+                if 0 <= next_pos[0] < self.width and 0 <= next_pos[1] < self.height:
                     if next_pos not in self.memory or self.memory[next_pos] >= self.steps:
                         heappush(queue, (step + 1, next_pos, pos))
                         frontier.add(next_pos)
