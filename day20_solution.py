@@ -8,7 +8,7 @@ class D20S(Solution):
         super().__init__()
         self.day = 20
         self.expected_test_result_part_1 = 0
-        self.expected_test_result_part_2 = 2
+        self.expected_test_result_part_2 = 285
         self.walls = None
         self.start = None
         self.end = None
@@ -16,17 +16,22 @@ class D20S(Solution):
     def solve_part_1(self):
         self.get_walls_start_end()
         path = self.find_path()
+        self.path = path
         cheats = self.find_cheats_part_1(path)
         if self.is_test:
             for i in range(70):
                 count = len([cheat for cheat in cheats if cheat[0] == i])
-                if count > 0: print(f"Found {count} cheats of length {i}")
+                if count > 0: print(f"There are {count} cheats that save {i} picoseconds.")
         return len([cheat for cheat in cheats if cheat[0] >=100])
 
     def solve_part_2(self):
         self.get_walls_start_end()
         path = self.find_path()
         cheats = self.find_cheats_part_2(path)
+        if self.is_test:
+            for i in range(50, 100):
+                count = len([cheat for cheat in cheats if cheat[0] == i])
+                if count > 0:  print(f"There are {count} cheats that save {i} picoseconds.")
         treshold = 50 if self.is_test else 100
         return len([cheat for cheat in cheats if cheat[0] >=treshold])
 
@@ -57,54 +62,28 @@ class D20S(Solution):
     def find_cheats_part_1(self, path):
         cheats = set()
         for i in range(0, len(path)-2):
-            cheats.update(self.find_cheats_of_length(path[i], 2, path))
+            cheats.update(self.find_cheats_in_path(i, 2, path))
         return cheats
 
     def find_cheats_part_2(self, path):
         cheats = set()
-        for i in range(0, len(path)-20):
-            print(f"Checking {i} of {len(path)-20}")
-            cheats.update(self.find_cheats_of_length(path[i], 20, path))
-            print(f"Found {len(cheats)} cheats")
-        return cheats
-
-    def find_cheats(self, path):
-        cheats = []
         for i in range(0, len(path)-2):
-            for direction in DIRECTIONS:
-                new_pos = (path[i][0] + direction[0]*2, path[i][1] + direction[1]*2)
-                try:
-                    j = path.index(new_pos)
-                    if j > i+2:
-                        cheats.append((j-i-2, path[i], new_pos))
-                except ValueError:
-                    continue
-            pass
+            cheats.update(self.find_cheats_in_path(i, 20, path))
         return cheats
 
-    def find_cheats_of_length(self, start, count, path, pos=None, pico=None, cheats=None):
-        if cheats is None:
-            cheats = set()
-        if pos is None:
-            pos = start
-            pico = path.index(start)
-        if count == 0:
-            return cheats
-        for direction in DIRECTIONS:
-            new_pos = (pos[0] + direction[0], pos[1] + direction[1])
-            if abs(start[0] - new_pos[0]) < abs(start[0] - pos[0]):
-                continue
-            if abs(start[1] - new_pos[1]) < abs(start[1] - pos[1]):
-                continue
-            if new_pos not in self.walls:
-                try:
-                    j = path.index(new_pos)
-                    if j > pico + 1:
-                        cheats.add((j-pico - 1, start, new_pos))
-                except ValueError:
-                    pass
-            self.find_cheats_of_length(start, count-1, path, new_pos, pico+1, cheats)
+    def find_cheats_in_path(self, start_index, max_ham_distance, path):
+        cheats = set()
+        for j in range(start_index + 1, len(path)):
+            path_distance = j-start_index
+            ham_distance = self.hamming_distance(path[start_index], path[j])
+            if ham_distance> max_ham_distance: continue
+            if ham_distance < path_distance:
+                saving = path_distance - ham_distance
+                cheats.add((saving, path[start_index], path[j]))
         return cheats
+
+    def hamming_distance(self, pos1, pos2):
+        return abs(pos1[0] - pos2[0]) + abs(pos1[1] - pos2[1])
 
 if __name__ == "__main__":
     D20S().test()
