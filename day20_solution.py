@@ -16,8 +16,9 @@ class D20S(Solution):
     def solve_part_1(self):
         self.get_walls_start_end()
         path = self.find_path()
-        self.path = path
-        cheats = self.find_cheats_part_1(path)
+        cheats = set()
+        for i in range(0, len(path)-2):
+            cheats.update(self.find_cheats_in_path(i, 2, path))
         if self.is_test:
             for i in range(70):
                 count = len([cheat for cheat in cheats if cheat[0] == i])
@@ -27,7 +28,9 @@ class D20S(Solution):
     def solve_part_2(self):
         self.get_walls_start_end()
         path = self.find_path()
-        cheats = self.find_cheats_part_2(path)
+        cheats = set()
+        for i in range(0, len(path)-2):
+            cheats.update(self.find_cheats_in_path(i, 20, path))
         if self.is_test:
             for i in range(50, 100):
                 count = len([cheat for cheat in cheats if cheat[0] == i])
@@ -58,18 +61,6 @@ class D20S(Solution):
                 path.append(new_pos)
                 break
         return path
-
-    def find_cheats_part_1(self, path):
-        cheats = set()
-        for i in range(0, len(path)-2):
-            cheats.update(self.find_cheats_in_path(i, 2, path))
-        return cheats
-
-    def find_cheats_part_2(self, path):
-        cheats = set()
-        for i in range(0, len(path)-2):
-            cheats.update(self.find_cheats_in_path(i, 20, path))
-        return cheats
 
     def find_cheats_in_path(self, start_index, max_ham_distance, path):
         cheats = set()
