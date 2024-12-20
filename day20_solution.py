@@ -1,3 +1,5 @@
+from idlelib.run import manage_socket
+
 from aoc_tools.solution import Solution
 
 DIRECTIONS = [(1,0), (0, 1), (-1, 0), (0, -1)]
@@ -62,18 +64,18 @@ class D20S(Solution):
                 break
         return path
 
-    def find_cheats_in_path(self, start_index, max_ham_distance, path):
+    def find_cheats_in_path(self, start_index, max_man_distance, path):
         cheats = set()
         for j in range(start_index + 1, len(path)):
             path_distance = j-start_index
-            ham_distance = self.hamming_distance(path[start_index], path[j])
-            if ham_distance> max_ham_distance: continue
-            if ham_distance < path_distance:
-                saving = path_distance - ham_distance
+            man_distance = self.manhattan_distance(path[start_index], path[j])
+            if man_distance> max_man_distance: continue
+            if man_distance < path_distance:
+                saving = path_distance - man_distance
                 cheats.add((saving, path[start_index], path[j]))
         return cheats
 
-    def hamming_distance(self, pos1, pos2):
+    def manhattan_distance(self, pos1, pos2):
         return abs(pos1[0] - pos2[0]) + abs(pos1[1] - pos2[1])
 
 if __name__ == "__main__":
