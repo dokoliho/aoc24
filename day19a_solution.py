@@ -1,6 +1,5 @@
-from functools import cache
 from aoc_tools.solution import Solution
-from aoc_tools.nfa import NFA, State
+from aoc_tools.nfa import NFA
 
 class D19aS(Solution):
 
@@ -17,8 +16,7 @@ class D19aS(Solution):
         nfa = NFA()
         for token in self.tokens:
             nfa.add_pattern(token)
-        accepted = [word for word in self.words if nfa.accepts(word)]
-        print(accepted)
+        accepted = [word for word in self.words if nfa.accepts(word)>0]
         result = len(accepted)
         return result
 
@@ -28,7 +26,6 @@ class D19aS(Solution):
         for token in self.tokens:
             nfa.add_pattern(token)
         count = sum([nfa.accepts(word) for word in self.words])
-        print(count)
         return count
 
     def get_tokens_and_words(self):
@@ -39,11 +36,6 @@ class D19aS(Solution):
             if line == "": is_second_segment = True
             elif is_second_segment: self.words.append(line)
             else: self.tokens += list(map(str.strip, line.split(",")))
-
-
-
-
-
 
 if __name__ == "__main__":
     D19aS().test()

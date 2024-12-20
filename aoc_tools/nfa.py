@@ -5,13 +5,12 @@ class State:
     def __init__(self, name, transitions=None):
         self.name = name
         self.transitions = transitions or defaultdict(list)
-        self.counter = 0
 
     def add_transition(self, symbol, state):
         self.transitions[symbol].append(state)
 
     def __repr__(self):
-        return f"State {self.state_id}: ({self.name})"
+        return f"State {self.name}"
 
     def __str__(self):
         return self.name
@@ -20,46 +19,24 @@ class NFA:
     def __init__(self):
         self.start_state = State("Start")
 
-    def reset_counter(self):
-        current_states = [self.start_state]
-        while len(current_states) > 0:
-            next_states = []
-            for state in current_states:
-                state.counter = 0
-                for successors in state.transitions.values():
-                    for next_state in successors:
-                        if next_state != self.start_state:
-                            next_states.append(next_state)
-            current_states = next_states
-
     def accepts(self, string):
-        self.reset_counter()
-        current_states = self.start_state.transitions[None]
+        current_states = [(1, state) for state in self.start_state.transitions[None]]
         for symbol in string:
             next_states = []
-            for state in set(current_states):
-                state.counter += 1
-                succ = state.transitions[symbol]
-                trans_succ = self.transitive_closure(succ)
-                next_states.extend(trans_succ)
+            #how many start states do we pass this round?
+            start_state_count = sum([count for count, state in current_states if state == self.start_state])
+            while current_states:
+                count, state = current_states.pop()
+                # all new patterns start with the start state count, but only once
+                if state == self.start_state and start_state_count > 0:
+                    current_states.extend([(start_state_count, state) for state in self.start_state.transitions[None]])
+                    start_state_count = 0
+                else:
+                    transitions = state.transitions[symbol]
+                    next_states.extend([(count, state) for state in transitions])
             current_states = next_states
-        accepted_counter = 0
-        for state in current_states:
-            state.counter += 1
-            if state == self.start_state:
-                accepted_counter += state.counter
-        print(f"Word: {string}, Start Counter: {accepted_counter}")
-        return self.start_state in current_states
-
-    def transitive_closure(self, states):
-        trans_succ = set(states)
-        while True:
-            length = len(trans_succ)
-            for s in states:
-                lst = s.transitions[None]
-                trans_succ.update(lst)
-            if len(trans_succ) == length: break
-        return trans_succ
+        result = sum([count for count, state in current_states if state == self.start_state])
+        return result
 
     def add_pattern(self, pattern):
         next_state = self.start_state
@@ -73,8 +50,13 @@ class NFA:
 
 if __name__ == "__main__":
     nfa = NFA()
-    nfa.add_pattern("abc")
-    assert nfa.accepts("abc")
-    assert not nfa.accepts("ab")
-    assert not nfa.accepts("abcd")
-    assert nfa.accepts("abcabc")
+    nfa.add_pattern("a")
+    nfa.add_pattern("ab")
+    nfa.add_pattern("c")
+    nfa.add_pattern("bc")
+    nfa.add_pattern("d")
+
+    assert nfa.accepts("ab") == 1
+    assert nfa.accepts("abc") == 2
+    assert nfa.accepts("abcd") == 2
+    assert nfa.accepts("bcd") == 1
