@@ -28,6 +28,8 @@ class D21S(Solution):
                 assert self.get_best_length(line, 2) == expected_length[num_part]
             # 0 is numerical -> direction,  1 and 2 are directions
             sum += self.get_best_length(line, 2) * num_part
+        # print(self.get_all_paths_on_keyboard.cache_info())
+        # print(self.get_best_length.cache_info())
         return sum
 
     def solve_part_2(self):
@@ -39,6 +41,8 @@ class D21S(Solution):
             # 1-25 are directions
             min_length = self.get_best_length(line, 25)
             sum += min_length * num_part
+        # print(self.get_all_paths_on_keyboard.cache_info())
+        # print(self.get_best_length.cache_info())
         return sum
 
     def generate_keyboards(self):
