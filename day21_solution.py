@@ -1,7 +1,9 @@
-from itertools import pairwise
+from functools import cache
 
 from aoc_tools.solution import Solution
 import networkx as nx
+from itertools import pairwise
+
 
 class D21S(Solution):
 
@@ -9,7 +11,7 @@ class D21S(Solution):
         super().__init__()
         self.day = 21
         self.expected_test_result_part_1 = 126384
-        self.expected_test_result_part_2 = 2
+        self.expected_test_result_part_2 = 154115708116294
         self.numeric_keyboard = None
         self.directional_keyboard = None
 
@@ -19,24 +21,31 @@ class D21S(Solution):
         sum = 0
         for line in self.puzzle:
             num_part = int(line[:-1])
-            radiation_sequences = self.all_shortest_paths(line, self.numeric_keyboard)
+            radiation_sequences = self.all_shortest_paths(line)
             if self.is_test and num_part == 29:
                 assert len(radiation_sequences) == 3
                 assert '<A^A>^^AvvvA' in radiation_sequences
                 assert '<A^A^>^AvvvA' in radiation_sequences
                 assert '<A^A^^>AvvvA' in radiation_sequences
+                assert self.get_best_length(line, 0) == len('<A^A^^>AvvvA')
+
 
             freezing_sequences = []
             for s in radiation_sequences:
-                freezing_sequences.extend(self.all_shortest_paths(s, self.directional_keyboard))
+                freezing_sequences.extend(self.all_shortest_paths(s))
             if self.is_test and num_part == 29:
                 assert 'v<<A>>^A<A>AvA<^AA>A<vAAA>^A' in freezing_sequences
+                assert self.get_best_length(line, 1) == len('v<<A>>^A<A>AvA<^AA>A<vAAA>^A')
 
             historian_sequences = []
             for s in freezing_sequences:
-                historian_sequences.extend(self.all_shortest_paths(s, self.directional_keyboard))
+                historian_sequences.extend(self.all_shortest_paths(s))
             historian_len = min(map(len, historian_sequences))
             historian_sequences =  [sequence for sequence in historian_sequences if len(sequence) == historian_len]
+
+            if self.is_test:
+                assert self.get_best_length(line, 2) == historian_len
+
 
             if self.is_test:
                 expected = None
@@ -64,7 +73,15 @@ class D21S(Solution):
         return sum
 
     def solve_part_2(self):
-        return 2
+        self.generate_keyboards()
+        sum = 0
+        for line in self.puzzle:
+            num_part = int(line[:-1])
+            # 0 is numerical -> direction
+            # 1-25 are directions
+            min_length = self.get_best_length(line, 25)
+            sum += min_length * num_part
+        return sum
 
     def generate_keyboards(self):
         numeric_edges = [
@@ -123,17 +140,50 @@ class D21S(Solution):
         self.directional_keyboard = nx.DiGraph()
         self.directional_keyboard.add_edges_from(directional_edges)
 
-    def all_shortest_paths(self, string, keyboard):
+    def all_shortest_paths(self, sequence):
         prefixes = [""]
-        for start, end in pairwise('A'+string):
-            new_prefixes = []
-            for path in nx.all_shortest_paths(keyboard, start, end):
-                edges = [(path[i], path[i + 1]) for i in range(len(path) - 1)]
-                symbols = [keyboard.get_edge_data(*edge)['symbol'] for edge in edges]
-                for prefix in prefixes:
-                    new_prefixes.append(prefix + "".join(symbols)+'A')
-            prefixes = new_prefixes
+        keyboard = self.numeric_keyboard if sequence[0].isdigit() else self.directional_keyboard
+        for start, end in pairwise('A'+sequence):
+            prefixes = self.extend_prefixes(prefixes, keyboard, start, end)
         return prefixes
+
+    def extend_prefixes(self, prefixes, keyboard, start, end):
+        suffixes = self.get_all_paths_on_keyboard(keyboard, start, end)
+        new_prefixes = []
+        new_prefixes.extend(prefix + suffix + 'A' for prefix in prefixes for suffix in suffixes)
+        return new_prefixes
+
+
+    @cache
+    def get_all_paths_on_keyboard(self, keyboard, start, end):
+        paths = []
+        for path in nx.all_shortest_paths(keyboard, start, end):
+            edges = [(path[i], path[i + 1]) for i in range(len(path) - 1)]
+            symbols = [keyboard.get_edge_data(*edge)['symbol'] for edge in edges]
+            paths.append("".join(symbols))
+        return paths
+
+    @cache
+    def get_best_length(self, sequence, level):
+        result = 0
+        keyboard = self.numeric_keyboard if sequence[0].isdigit() else self.directional_keyboard
+        for start, end in pairwise('A' + sequence):
+            paths = self.get_all_paths_on_keyboard(keyboard, start, end)
+            if level == 0:
+                length = min(len(path) for path in paths) + 1 if paths else 1 # +1 for the 'A' at the end
+                result += length
+                continue
+
+            if not paths:
+                result += 1 # +1 for the 'A' at the end
+                continue
+
+            lengths = set()
+            for path in paths:
+                lengths.add(self.get_best_length(path + 'A', level - 1))
+            result += min(lengths)
+
+        return result
 
 if __name__ == "__main__":
     D21S().test()
