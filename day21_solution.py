@@ -18,16 +18,51 @@ class D21S(Solution):
         self.generate_keyboards()
         sum = 0
         for line in self.puzzle:
+            num_part = int(line[:-1])
             radiation_sequences = self.all_shortest_paths(line, self.numeric_keyboard)
+            if self.is_test and num_part == 29:
+                assert len(radiation_sequences) == 3
+                assert '<A^A>^^AvvvA' in radiation_sequences
+                assert '<A^A^>^AvvvA' in radiation_sequences
+                assert '<A^A^^>AvvvA' in radiation_sequences
+
             freezing_sequences = []
             for s in radiation_sequences:
                 freezing_sequences.extend(self.all_shortest_paths(s, self.directional_keyboard))
+            if self.is_test and num_part == 29:
+                assert 'v<<A>>^A<A>AvA<^AA>A<vAAA>^A' in freezing_sequences
+
             historian_sequences = []
             for s in freezing_sequences:
                 historian_sequences.extend(self.all_shortest_paths(s, self.directional_keyboard))
-            historian_len = len(historian_sequences[0])-2
-            num_part = int(line[:-1])
+            historian_len = min(map(len, historian_sequences))
+            historian_sequences =  [sequence for sequence in historian_sequences if len(sequence) == historian_len]
+
+            if self.is_test:
+                expected = None
+                length = 0
+                if num_part == 29:
+                    expected = '<vA<AA>>^AvAA<^A>A<v<A>>^AvA^A<vA>^A<v<A>^A>AAvA^A<v<A>A>^AAAvA<^A>A'
+                    length = 68
+                elif num_part == 980:
+                    expected = '<v<A>>^AAAvA^A<vA<AA>>^AvAA<^A>A<v<A>A>^AAAvA<^A>A<vA>^A<A>A'
+                    length = 60
+                elif num_part == 179:
+                    expected = '<v<A>>^A<vA<A>>^AAvAA<^A>A<v<A>>^AAvA^A<vA>^AA<A>A<v<A>A>^AAAvA<^A>A'
+                    length = 68
+                elif num_part == 456:
+                    expected = '<v<A>>^AA<vA<A>>^AAvAA<^A>A<vA>^A<A>A<vA>^A<A>A<v<A>A>^AAvA<^A>A'
+                    length = 64
+                elif num_part == 379:
+                    expected = '<v<A>>^AvA^A<vA<AA>>^AAvA<^A>AAvA^A<vA>^AA<A>A<v<A>A>^AAAvA<^A>A'
+                    length = 64
+                assert expected in historian_sequences
+                assert length == len(expected)
+                assert length == len(historian_sequences[0])
+
+
             print(f"Line: {line}, len: {historian_len}, num: {num_part}")
+
             sum += historian_len * num_part
         return sum
 
@@ -90,9 +125,6 @@ class D21S(Solution):
             ]
         self.directional_keyboard = nx.DiGraph()
         self.directional_keyboard.add_edges_from(directional_edges)
-
-    def all_shortest_numeric_paths(self, number_string):
-        return self.all_shortest_paths(number_string, self.numeric_keyboard)
 
     def all_shortest_paths(self, string, keyboard):
         prefixes = [""]
