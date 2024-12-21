@@ -60,9 +60,6 @@ class D21S(Solution):
                 assert length == len(expected)
                 assert length == len(historian_sequences[0])
 
-
-            print(f"Line: {line}, len: {historian_len}, num: {num_part}")
-
             sum += historian_len * num_part
         return sum
 
