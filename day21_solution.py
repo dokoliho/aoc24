@@ -117,9 +117,7 @@ class D21S(Solution):
         keyboard = self.numeric_keyboard if sequence[0].isdigit() else self.directional_keyboard
         for start, end in pairwise('A' + sequence):
             paths = self.get_all_paths_on_keyboard(keyboard, start, end)
-            if not paths:
-                result += 1  # +1 for the 'A' at the end
-            elif level == 0:
+            if level == 0:
                 result += min(len(path) for path in paths) + 1  # +1 for the 'A' at the end
             else:
                 result += min(self.get_best_length(path + 'A', level - 1) for path in paths)
