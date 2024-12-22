@@ -31,13 +31,6 @@ def create_sequence_generator(start):
         if len(seq) == 4: yield tuple(seq), price
         old_price = price
 
-def create_price_map(start):
-    m = {}
-    for seq, price in create_sequence_generator(start):
-        if seq not in m:
-            m[seq] = price
-    return m
-
 
 class D22S(Solution):
 
