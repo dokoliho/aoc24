@@ -10,7 +10,7 @@ def prune(a):
 
 def create_random_generator(start):
     num = start
-    while True:
+    for _ in range(2000):
         # Step 1
         result = num << 6
         num = mix(num, result)
@@ -28,19 +28,25 @@ def create_random_generator(start):
 def create_price_generator(start):
     yield start % 10
     gen = create_random_generator(start)
-    while True:
-        yield next(gen) % 10
+    for value in gen:
+        yield value % 10
 
 def create_sequence_generator(start):
     gen = create_price_generator(start)
     seq = deque([])
     old_price = next(gen)
-    while True:
-        price = next(gen)
+    for price in gen:
         seq.append(price - old_price)
         if len(seq) > 4: seq.popleft()
         if len(seq) == 4: yield tuple(seq), price
         old_price = price
+
+def create_price_map(start):
+    m = {}
+    for seq, price in create_sequence_generator(start):
+        if seq not in m:
+            m[seq] = price
+    return m
 
 
 class D22S(Solution):
@@ -49,7 +55,7 @@ class D22S(Solution):
         super().__init__()
         self.day = 22
         self.expected_test_result_part_1 = 37327623
-        self.expected_test_result_part_2 = 2
+        self.expected_test_result_part_2 = 24
 
     def solve_part_1(self):
         result = 0
@@ -60,7 +66,18 @@ class D22S(Solution):
         return result
 
     def solve_part_2(self):
-        return 2
+        price_maps = []
+        for start in map(int, self.puzzle):
+            price_maps.append(create_price_map(start))
+        all_sequences = set.union(*[set(price_map.keys()) for price_map in price_maps])
+        bananas = []
+        for sequence in all_sequences:
+            result = 0
+            for price_map in price_maps:
+                result += price_map.get(sequence, 0)
+            bananas.append((sequence, result))
+        bananas.sort(reverse=True, key=lambda x: x[1])
+        return bananas[0][1]
 
 
 
