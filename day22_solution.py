@@ -55,7 +55,7 @@ class D22S(Solution):
         super().__init__()
         self.day = 22
         self.expected_test_result_part_1 = 37327623
-        self.expected_test_result_part_2 = 24
+        self.expected_test_result_part_2 = 23
 
     def solve_part_1(self):
         result = 0
@@ -66,6 +66,13 @@ class D22S(Solution):
         return result
 
     def solve_part_2(self):
+        if self.is_test:
+            self.puzzle = [
+                "1",
+                "2",
+                "3",
+                "2024",
+            ]
         price_maps = []
         for start in map(int, self.puzzle):
             price_maps.append(create_price_map(start))
